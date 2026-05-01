@@ -6,6 +6,22 @@ DSG Secure Deploy Gate blocks unsafe deployments before production by checking r
 
 ## Usage
 
+Recommended stable major-version reference:
+
+```yaml
+- name: DSG Secure Deploy Gate
+  uses: tdealer01-crypto/dsg-secure-deploy-gate-action@v1
+```
+
+Pinned release reference:
+
+```yaml
+- name: DSG Secure Deploy Gate
+  uses: tdealer01-crypto/dsg-secure-deploy-gate-action@v1.0.2
+```
+
+Full workflow example:
+
 ```yaml
 name: DSG Secure Deploy Gate
 
@@ -18,7 +34,8 @@ jobs:
   dsg-gate:
     runs-on: ubuntu-latest
     steps:
-      - uses: tdealer01-crypto/dsg-secure-deploy-gate-action@v1
+      - name: DSG Secure Deploy Gate
+        uses: tdealer01-crypto/dsg-secure-deploy-gate-action@v1.0.2
         with:
           readiness_url: "https://your-app.vercel.app/api/finance-governance/readiness"
           expected_status: "200"
@@ -26,6 +43,8 @@ jobs:
           protected_url: "https://your-app.vercel.app/api/finance-governance/audit-ledger"
           protected_expected: "401,403"
 ```
+
+Use `@v1` for automatic compatible v1 updates. Use `@v1.0.2` when you need an exact pinned release.
 
 ## What it checks
 
@@ -52,6 +71,10 @@ jobs:
 | `verdict` | `GO` or `NO-GO` |
 | `readiness_status` | HTTP status from readiness endpoint |
 | `evidence_hash` | SHA256 hash of the evidence payload |
+
+## Evidence boundary
+
+This Action provides a deterministic deployment gate for CI/CD readiness and protected-route checks. It does not claim independent third-party certification.
 
 ## DSG product fit
 
