@@ -1,0 +1,17 @@
+{
+  "name": "dsg-secure-deploy-gate-demo-nextjs",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "15.5.18",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,41 @@
+name: DSG Secure Deploy Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  dsg-gate:
+    runs-on: ubuntu-latest
+    name: Production Readiness Gate
+    steps:
+      - name: DSG Secure Deploy Gate
+        id: dsg
+        uses: tdealer01-crypto/dsg-secure-deploy-gate-action@v1
+        with:
+          preset: strict
+          readiness_url: "https://your-app.vercel.app/api/readiness"
+          expected_status: "200"
+          require_json_ok: "true"
+          protected_url: "https://your-app.vercel.app/api/private-audit"
+          protected_expected: "401,403"
+          comment_on_pr: "true"
+          evidence_file: "dsg-evidence.json"
+          policy_name: "production-readiness"
+          policy_version: "v1"
+          fail_on_no_go: "true"
+
+      - name: Upload DSG evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsg-evidence-${{ github.run_id }}
+          path: dsg-evidence.json
+          retention-days: 30
