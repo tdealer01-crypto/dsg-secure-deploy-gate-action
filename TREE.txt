@@ -1,0 +1,12 @@
+PR_DIFF_SUMMARY.md
+README.md
+TREE.txt
+VERIFICATION.md
+action.yml
+docs/marketplace-release-checklist.md
+docs/pricing.md
+docs/proof-format.md
+examples/workflows/dsg-gate.example.yml
+scripts/dsg-gate.sh
+scripts/dsg-pr-comment.sh
+scripts/verify-proof.py

@@ -8,41 +8,85 @@ branding:
 
 inputs:
   readiness_url:
-    description: "Production readiness endpoint URL."
+    description: "Readiness endpoint URL."
     required: true
-
   expected_status:
-    description: "Expected HTTP status code."
+    description: "Expected readiness HTTP status code."
     required: false
     default: "200"
-
   require_json_ok:
     description: "Require response JSON to contain ok=true."
     required: false
     default: "true"
-
   protected_url:
-    description: "Optional protected route URL expected to return 401 or 403 when unauthenticated."
+    description: "Optional protected route URL expected to deny unauthenticated access."
     required: false
     default: ""
-
   protected_expected:
-    description: "Expected unauthenticated status for protected route. Comma-separated values are allowed."
+    description: "Comma-separated expected unauthenticated status codes for protected route."
     required: false
     default: "401,403"
+  preset:
+    description: "Gate preset: basic, standard, strict, or audit-only."
+    required: false
+    default: "strict"
+  comment_on_pr:
+    description: "Post or update a DSG result comment on pull requests."
+    required: false
+    default: "false"
+  evidence_file:
+    description: "Path to write deterministic evidence JSON."
+    required: false
+    default: "dsg-evidence.json"
+  policy_name:
+    description: "Policy name recorded in evidence."
+    required: false
+    default: "production-readiness"
+  policy_version:
+    description: "Policy version recorded in evidence."
+    required: false
+    default: "v1"
+  previous_proof_hash:
+    description: "Optional previous proof hash for chain linking."
+    required: false
+    default: ""
+  proof_timestamp:
+    description: "Optional fixed proof timestamp for reproducible fixtures. Defaults to current UTC time."
+    required: false
+    default: ""
+  fail_on_no_go:
+    description: "Fail the job when verdict is NO-GO. Ignored for audit-only preset."
+    required: false
+    default: "true"
 
 outputs:
   verdict:
     description: "GO or NO-GO result."
     value: ${{ steps.dsg_gate.outputs.verdict }}
-
   readiness_status:
     description: "Readiness HTTP status."
     value: ${{ steps.dsg_gate.outputs.readiness_status }}
-
+  protected_status:
+    description: "Protected route HTTP status, when checked."
+    value: ${{ steps.dsg_gate.outputs.protected_status }}
+  failure_reason:
+    description: "Machine-readable NO-GO reason."
+    value: ${{ steps.dsg_gate.outputs.failure_reason }}
   evidence_hash:
-    description: "SHA256 hash of the gate evidence."
+    description: "SHA256 hash of canonical evidence."
     value: ${{ steps.dsg_gate.outputs.evidence_hash }}
+  policy_hash:
+    description: "SHA256 hash of canonical policy."
+    value: ${{ steps.dsg_gate.outputs.policy_hash }}
+  proof_hash:
+    description: "SHA256 hash of canonical proof."
+    value: ${{ steps.dsg_gate.outputs.proof_hash }}
+  chain_hash:
+    description: "SHA256 proof chain hash."
+    value: ${{ steps.dsg_gate.outputs.chain_hash }}
+  evidence_file:
+    description: "Path to the evidence JSON file."
+    value: ${{ steps.dsg_gate.outputs.evidence_file }}
 
 runs:
   using: "composite"
@@ -58,3 +102,26 @@ runs:
         DSG_REQUIRE_JSON_OK: ${{ inputs.require_json_ok }}
         DSG_PROTECTED_URL: ${{ inputs.protected_url }}
         DSG_PROTECTED_EXPECTED: ${{ inputs.protected_expected }}
+        DSG_PRESET: ${{ inputs.preset }}
+        DSG_EVIDENCE_FILE: ${{ inputs.evidence_file }}
+        DSG_POLICY_NAME: ${{ inputs.policy_name }}
+        DSG_POLICY_VERSION: ${{ inputs.policy_version }}
+        DSG_PREVIOUS_PROOF_HASH: ${{ inputs.previous_proof_hash }}
+        DSG_PROOF_TIMESTAMP: ${{ inputs.proof_timestamp }}
+    - name: Post DSG PR comment
+      if: ${{ always() && inputs.comment_on_pr == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      run: |
+        bash "$GITHUB_ACTION_PATH/scripts/dsg-pr-comment.sh"
+      env:
+        DSG_EVIDENCE_FILE: ${{ inputs.evidence_file }}
+        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        GITHUB_API_URL: ${{ github.api_url }}
+    - name: Enforce DSG verdict
+      if: ${{ always() && inputs.fail_on_no_go == 'true' && inputs.preset != 'audit-only' && steps.dsg_gate.outputs.verdict != 'GO' }}
+      shell: bash
+      run: |
+        echo "DSG gate failed: ${{ steps.dsg_gate.outputs.failure_reason }}"
+        exit 1
