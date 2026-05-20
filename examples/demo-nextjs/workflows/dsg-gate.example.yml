@@ -1,0 +1,66 @@
+name: DSG Secure Deploy Gate Demo
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  dsg-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build demo app
+        run: npm run build
+
+      - name: Start demo app
+        run: |
+          npm run start > /tmp/dsg-demo-next.log 2>&1 &
+          echo $! > /tmp/dsg-demo-next.pid
+
+      - name: Wait for demo app
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:3000/api/readiness >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/dsg-demo-next.log || true
+          exit 1
+
+      - name: DSG Secure Deploy Gate
+        id: dsg
+        uses: tdealer01-crypto/dsg-secure-deploy-gate-action@v1
+        with:
+          preset: strict
+          readiness_url: "http://localhost:3000/api/readiness"
+          expected_status: "200"
+          require_json_ok: "true"
+          protected_url: "http://localhost:3000/api/private-audit"
+          protected_expected: "401"
+          comment_on_pr: "true"
+          evidence_file: "dsg-evidence.json"
+
+      - name: Upload DSG evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsg-evidence-${{ github.run_id }}
+          path: dsg-evidence.json
