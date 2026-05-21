@@ -16,6 +16,18 @@ It is designed for teams that need deploy evidence, CI/CD governance, and a clea
 
 ---
 
+## Evidence screenshots
+
+| PR comment GO | Landing page |
+|---|---|
+| ![DSG PR comment GO](docs/media/pr-comment-go.jpg) | ![DSG ProofGate landing page](docs/media/landing-page.jpg) |
+
+| Demo workflow success | GitHub profile pins |
+|---|---|
+| ![DSG demo workflow success](docs/media/demo-workflow-success.jpg) | ![DSG GitHub profile pins](docs/media/github-profile-pins.jpg) |
+
+---
+
 ## What it does
 
 - Checks a readiness endpoint such as `/api/readiness`.
