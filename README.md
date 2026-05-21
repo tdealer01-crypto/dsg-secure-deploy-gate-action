@@ -8,6 +8,12 @@ It is designed for teams that need deploy evidence, CI/CD governance, and a clea
 
 > **Truth boundary:** this Action helps generate repeatable deployment evidence. It is not, by itself, a PDPA, ISO 27001, SOC 2, WORM, or third-party compliance certification.
 
+## Links
+
+- Landing page: https://tdealer01-crypto-dsg-control-plane.vercel.app/proofgate-github-action
+- Demo repo: https://github.com/tdealer01-crypto/dsg-gate-demo-nextjs
+- Marketplace: https://github.com/marketplace/actions/dsg-secure-deploy-gate
+
 ---
 
 ## What it does
@@ -171,6 +177,8 @@ DSG proof verification: PASS
 ---
 
 ## Demo app
+
+Live demo repository: https://github.com/tdealer01-crypto/dsg-gate-demo-nextjs
 
 See [`examples/demo-nextjs`](examples/demo-nextjs) for a minimal Next.js app with:
 
