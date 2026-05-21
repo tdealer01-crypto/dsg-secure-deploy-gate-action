@@ -6,10 +6,10 @@ Use this folder for README, Marketplace, launch posts, and profile proof screens
 
 Save screenshots in this folder with these exact names:
 
-- `pr-comment-go.png`
-- `landing-page.png`
-- `demo-workflow-success.png`
-- `github-profile-pins.png`
+- `pr-comment-go.jpg`
+- `landing-page.jpg`
+- `demo-workflow-success.jpg`
+- `github-profile-pins.jpg`
 
 ## Screenshot checklist
 
@@ -58,11 +58,11 @@ After the images are added, copy this block into the main README:
 
 | PR comment GO | Landing page |
 |---|---|
-| ![DSG PR comment GO](docs/media/pr-comment-go.png) | ![DSG ProofGate landing page](docs/media/landing-page.png) |
+| ![DSG PR comment GO](docs/media/pr-comment-go.jpg) | ![DSG ProofGate landing page](docs/media/landing-page.jpg) |
 
 | Demo workflow success | GitHub profile pins |
 |---|---|
-| ![DSG demo workflow success](docs/media/demo-workflow-success.png) | ![DSG GitHub profile pins](docs/media/github-profile-pins.png) |
+| ![DSG demo workflow success](docs/media/demo-workflow-success.jpg) | ![DSG GitHub profile pins](docs/media/github-profile-pins.jpg) |
 
 ## Boundary
 
