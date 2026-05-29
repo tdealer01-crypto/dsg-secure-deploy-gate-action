@@ -24,10 +24,15 @@ jobs:
         run: bats tests/test_dsg_gate.bats
 
   python:
-    name: Python – verify-proof.py unit tests
+    name: Python – verify-proof.py unit tests + coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Python unit tests
-        run: python3 -m pytest tests/test_verify_proof.py -v --tb=short
+      - name: Install pytest and coverage tools
+        run: pip3 install pytest pytest-cov
+
+      - name: Run Python unit tests with coverage
+        run: |
+          python3 -m pytest tests/test_verify_proof.py -v --tb=short \
+            --cov=scripts --cov-report=term-missing --cov-fail-under=80
