@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Stub curl for Bats tests.
+# Behavior is controlled by environment variables:
+#   MOCK_READINESS_STATUS  (default: 200)
+#   MOCK_READINESS_BODY    (default: {"ok":true})
+#   MOCK_PROTECTED_PATH    (default: empty – disables protected-URL branch)
+#   MOCK_PROTECTED_STATUS  (default: 401)
+#   MOCK_PROTECTED_BODY    (default: empty)
+out_file=""
+url=""
+prev_arg=""
+
+for arg in "$@"; do
+  case "$prev_arg" in
+    -o) out_file="$arg" ;;
+  esac
+  if [[ "$prev_arg" != "-o" && "$prev_arg" != "-w" && "$prev_arg" != "--max-time" ]]; then
+    case "$arg" in
+      -sS|-L|-o|-w|--max-time) : ;;
+      -*) : ;;
+      *) url="$arg" ;;
+    esac
+  fi
+  prev_arg="$arg"
+done
+
+if [[ -n "${MOCK_PROTECTED_PATH:-}" && "$url" == *"${MOCK_PROTECTED_PATH}"* ]]; then
+  body="${MOCK_PROTECTED_BODY:-}"
+  status="${MOCK_PROTECTED_STATUS:-401}"
+else
+  if [[ -n "${MOCK_READINESS_BODY:-}" ]]; then
+    body="$MOCK_READINESS_BODY"
+  else
+    body='{"ok":true}'
+  fi
+  status="${MOCK_READINESS_STATUS:-200}"
+fi
+
+[[ -n "$out_file" ]] && printf '%s' "$body" > "$out_file"
+printf '%s' "$status"
+exit 0
